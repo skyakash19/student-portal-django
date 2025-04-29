@@ -1,0 +1,233 @@
+{% extends 'base.html' %}
+{% block title %}Registered Students{% endblock %}
+
+{% block content %}
+<div class="container py-5 px-3">
+    <div class="row justify-content-center">
+        <div class="col-lg-11">
+
+            <!-- Back Button -->
+            <div class="mb-4">
+                <a href="{% url 'dashboard' %}" class="btn btn-lg fancy-back-btn shadow">
+                    <i class="bi bi-arrow-left-circle-fill me-2"></i> Back to Dashboard
+                </a>
+            </div>
+
+            <!-- Header -->
+            <div class="text-center mb-4">
+                <h1 class="fw-bold text-gradient display-5 animate__animated animate__fadeInDown">
+                    🎓 Registered Students
+                </h1>
+                <p class="lead text-muted animate__animated animate__fadeInUp">
+                    Empower your administration with elegance and functionality 💼✨
+                </p>
+            </div>
+
+            <!-- Search -->
+            <div class="mb-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <input type="text" id="searchInput" class="form-control form-control-lg shadow-sm w-100 w-md-auto" placeholder="🔍 Search by username or email...">
+                <span id="filterCount" class="badge bg-secondary d-none"></span>
+            </div>
+
+            <!-- Export All Buttons -->
+            <div class="d-flex justify-content-end gap-3 mb-4">
+                <a href="{% url 'export_students_excel' %}" class="btn btn-success btn-lg shadow-sm">
+                    <i class="bi bi-file-earmark-excel-fill me-2"></i> Export All to Excel
+                </a>
+                <a href="{% url 'export_students_pdf' %}" class="btn btn-danger btn-lg shadow-sm">
+                    <i class="bi bi-file-earmark-pdf-fill me-2"></i> Export All to PDF
+                </a>
+            </div>
+
+            {% if students %}
+            <!-- Pagination -->
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <span class="fw-semibold text-muted">Total Students: {{ students.paginator.count }}</span>
+                <ul class="pagination pagination-sm mb-0">
+                    {% if students.has_previous %}
+                        <li class="page-item"><a class="page-link" href="?page={{ students.previous_page_number }}">&laquo;</a></li>
+                    {% endif %}
+                    {% for num in students.paginator.page_range %}
+                        <li class="page-item {% if students.number == num %}active{% endif %}">
+                            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                        </li>
+                    {% endfor %}
+                    {% if students.has_next %}
+                        <li class="page-item"><a class="page-link" href="?page={{ students.next_page_number }}">&raquo;</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+
+            <!-- Table -->
+            <div class="card border-0 shadow-lg rounded-5 bg-white">
+                <div class="card-header bg-gradient text-white rounded-top-5 py-3 px-4" style="background: linear-gradient(to right, #667eea, #764ba2);">
+                    <h4 class="mb-0 fw-bold">
+                        <i class="bi bi-people-fill me-2"></i> All Registered Students
+                    </h4>
+                </div>
+                <div class="card-body p-4 bg-light-subtle">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle table-bordered mb-0 text-center sticky-header">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Avatar</th>
+                                    <th>Username</th>
+                                    <th>Email</th>
+                                    <th>Date Joined</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white">
+                                {% for student in students %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>
+                                        <div class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                            {{ student.user.username|slice:":1"|upper }}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {{ student.user.username }}
+                                        <button onclick="copyToClipboard('{{ student.user.username }}')" class="btn btn-sm btn-outline-secondary ms-2" data-bs-toggle="tooltip" title="Copy Username">
+                                            <i class="bi bi-clipboard"></i>
+                                        </button>
+                                    </td>
+                                    <td>
+                                        {{ student.user.email }}
+                                        <button onclick="copyToClipboard('{{ student.user.email }}')" class="btn btn-sm btn-outline-secondary ms-2" data-bs-toggle="tooltip" title="Copy Email">
+                                            <i class="bi bi-clipboard"></i>
+                                        </button>
+                                    </td>
+                                    <td>{{ student.user.date_joined|date:"M d, Y" }}</td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editModal{{ student.id }}" title="Edit">
+                                                <i class="bi bi-pencil-square"></i>
+                                            </button>
+                                            <a href="{% url 'delete_student' student.id %}" class="btn btn-outline-danger btn-sm" onclick="return confirm('Delete this student?');" title="Delete">
+                                                <i class="bi bi-trash-fill"></i>
+                                            </a>
+                                            <a href="{% url 'export_single_student_pdf' student.id %}" class="btn btn-outline-secondary btn-sm" title="Export PDF">
+                                                <i class="bi bi-file-earmark-pdf-fill"></i>
+                                            </a>
+                                            <button class="btn btn-outline-dark btn-sm dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false"></button>
+                                            <ul class="dropdown-menu">
+                                                <li><a class="dropdown-item" href="#">📧 Send Email</a></li>
+                                                <li><a class="dropdown-item" href="#">🎓 Assign to Course</a></li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <!-- Edit Modal -->
+                                <div class="modal fade" id="editModal{{ student.id }}" tabindex="-1" aria-labelledby="editModalLabel{{ student.id }}" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered animate__animated animate__zoomIn">
+                                        <div class="modal-content rounded-4 shadow">
+                                            <div class="modal-header bg-primary text-white rounded-top-4">
+                                                <h5 class="modal-title"><i class="bi bi-pencil-fill me-2"></i>Edit Student</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <form method="post" action="{% url 'edit_student' student.id %}">
+                                                {% csrf_token %}
+                                                <div class="modal-body">
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Username</label>
+                                                        <input type="text" class="form-control" name="username" value="{{ student.user.username }}" required>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Email</label>
+                                                        <input type="email" class="form-control" name="email" value="{{ student.user.email }}" required>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                    <button class="btn btn-primary">Save</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+                <div class="alert alert-warning text-center shadow-sm rounded-4 mt-4">
+                    🚫 No students found. Start enrolling now! 📚
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script>
+    document.getElementById("searchInput").addEventListener("keyup", function () {
+        let filter = this.value.toLowerCase();
+        let count = 0;
+        document.querySelectorAll("tbody tr").forEach(function (row) {
+            let username = row.children[2]?.textContent.toLowerCase();
+            let email = row.children[3]?.textContent.toLowerCase();
+            let show = username.includes(filter) || email.includes(filter);
+            row.style.display = show ? "" : "none";
+            if (show) count++;
+        });
+        const counter = document.getElementById("filterCount");
+        counter.textContent = `${count} matches`;
+        counter.classList.toggle("d-none", count === 0);
+    });
+
+    function copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(() => {
+            alert(`Copied: ${text}`);
+        });
+    }
+
+    var tooltips = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltips.map(t => new bootstrap.Tooltip(t));
+</script>
+
+<!-- Styles -->
+<style>
+    .text-gradient {
+        background: linear-gradient(135deg, #ff6ec4, #7873f5);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .fancy-back-btn {
+        background: linear-gradient(to right, #ff9a9e, #fad0c4);
+        color: #fff;
+        font-weight: 600;
+        padding: 0.75rem 1.75rem;
+        border: none;
+        border-radius: 50px;
+        transition: all 0.3s ease-in-out;
+        display: inline-flex;
+        align-items: center;
+        font-size: 1.1rem;
+    }
+
+    .fancy-back-btn:hover {
+        background: linear-gradient(to right, #a18cd1, #fbc2eb);
+        transform: scale(1.05);
+    }
+
+    .sticky-header thead th {
+        position: sticky;
+        top: 0;
+        background-color: #343a40;
+        z-index: 2;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: #e0e7ff;
+        transform: scale(1.01);
+        transition: 0.2s;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 12px;
+            color: #2e2e2e;
+            margin: 30px;
+        }
+
+        .header {
+            text-align: center;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #5e60ce;
+        }
+
+        .header h1 {
+            font-size: 26px;
+            margin-bottom: 4px;
+            color: #5e60ce;
+        }
+
+        .sub-info {
+            font-size: 11px;
+            color: #555;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 25px;
+        }
+
+        th, td {
+            padding: 10px 12px;
+            border: 1px solid #ccc;
+            text-align: center;
+        }
+
+        th {
+            background-color: #5e60ce;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        tr:hover {
+            background-color: #edf0ff;
+        }
+
+        .footer {
+            position: fixed;
+            bottom: 25px;
+            left: 30px;
+            right: 30px;
+            text-align: center;
+            font-size: 10px;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>🎓 Registered Students Report</h1>
+        <div class="sub-info">
+            Exported by <strong>{{ admin }}</strong> on {{ generated_on }}
+        </div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>👤 Username</th>
+                <th>📧 Email</th>
+                <th>📅 Joined On</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for student in students %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ student.user.username }}</td>
+                <td>{{ student.user.email }}</td>
+                <td>{{ student.user.date_joined|date:"M d, Y" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="footer">
+        Student Portal • Confidential • Page 1
+    </div>
+
+</body>
+</html>

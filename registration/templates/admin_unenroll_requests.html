@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+    <div class="text-center mb-4">
+        <h2 class="fw-bold text-primary">
+            <i class="bi bi-x-circle-fill me-2"></i> Unenrollment Requests Dashboard
+        </h2>
+        <p class="text-muted lead">Review and manage students' course unenrollment requests efficiently.</p>
+    </div>
+
+    {% if requests %}
+    <div class="table-responsive">
+        <table class="table table-hover table-bordered align-middle shadow-sm rounded-3">
+            <thead class="table-primary text-center">
+                <tr>
+                    <th><i class="bi bi-person-fill"></i> User</th>
+                    <th><i class="bi bi-book-half"></i> Course</th>
+                    <th><i class="bi bi-calendar-event-fill"></i> Requested On</th>
+                    <th><i class="bi bi-tools"></i> Actions</th>
+                </tr>
+            </thead>
+            <tbody class="text-center">
+                {% for req in requests %}
+                <tr class="animate__animated animate__fadeIn">
+                    <td class="fw-semibold">{{ req.user.username }}</td>
+                    <td class="text-info">{{ req.course.name }}</td>
+                    <td class="text-muted">{{ req.requested_on|date:"M d, Y • h:i A" }}</td>
+                    <td>
+                        <a href="{% url 'approve_unenroll' req.id %}" class="btn btn-outline-success btn-sm rounded-pill me-2">
+                            <i class="bi bi-check-circle-fill me-1"></i> Approve
+                        </a>
+                        <a href="{% url 'deny_unenroll' req.id %}" class="btn btn-outline-danger btn-sm rounded-pill">
+                            <i class="bi bi-x-circle-fill me-1"></i> Deny
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="alert alert-info text-center mt-5 rounded-3 shadow-sm py-4">
+        <i class="bi bi-info-circle-fill me-2 fs-4"></i> No pending unenrollment requests at the moment.
+    </div>
+    {% endif %}
+</div>
+
+<!-- Optional animation library -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+
+<style>
+    .table th, .table td {
+        vertical-align: middle !important;
+    }
+    .btn-outline-success:hover {
+        background-color: #198754;
+        color: white;
+        border-color: #198754;
+    }
+    .btn-outline-danger:hover {
+        background-color: #dc3545;
+        color: white;
+        border-color: #dc3545;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,177 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5 px-3">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+
+            <!-- Fancy Back Button -->
+            <div class="mb-4">
+                <a href="{% url 'dashboard' %}" class="btn btn-lg fancy-back-btn shadow-sm">
+                    <i class="bi bi-arrow-left-circle-fill me-2"></i> Back to Dashboard
+                </a>
+            </div>
+
+            <!-- Animated Header -->
+            <div class="text-center mb-5">
+                <h1 class="fw-bold text-gradient">🌟 Admin Course Control Panel</h1>
+                <p class="lead text-muted">Manage your college courses with ease and elegance ✨</p>
+            </div>
+
+            <!-- Add Course Form -->
+            <div class="card border-0 shadow-lg rounded-5 mb-5">
+                <div class="card-header text-white text-center rounded-top-5 py-3"
+                     style="background: linear-gradient(to right, #875cf5, #4c3cff);">
+                    <h4 class="fw-bold mb-0">➕ Add a Beautiful New Course</h4>
+                </div>
+                <div class="card-body p-5 bg-light-subtle">
+                    <form method="POST" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        <div class="mb-4">
+                            <label for="name" class="form-label fw-semibold text-dark">📘 Course Name</label>
+                            <input type="text" class="form-control form-control-lg rounded-pill shadow-sm border-primary"
+                                   id="name" name="name" required
+                                   placeholder="e.g., Machine Learning Magic ✨">
+                        </div>
+                        <div class="mb-4">
+                            <label for="description" class="form-label fw-semibold text-dark">📝 Course Description</label>
+                            <textarea class="form-control form-control-lg rounded-4 shadow-sm border-primary"
+                                      id="description" name="description" rows="4" required
+                                      placeholder="What is this course about? Let your students know!"></textarea>
+                        </div>
+                        <div class="text-end mt-4">
+                            <button type="submit" class="btn btn-lg btn-primary rounded-pill px-5 shadow-sm">
+                                🚀 Add Course
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Flash Messages -->
+            {% if messages %}
+                <div class="mb-4">
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show rounded-4 shadow-sm"
+                             role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- Course List -->
+            <div class="card border-0 shadow rounded-5 bg-white">
+                <div class="card-header bg-gradient text-white rounded-top-5"
+                     style="background: linear-gradient(to right, #ff6ec4, #7873f5);">
+                    <h5 class="mb-0 fw-bold">📚 Current Courses</h5>
+                </div>
+                <ul class="list-group list-group-flush">
+                    {% for course in courses %}
+                        <li class="list-group-item d-flex justify-content-between align-items-start px-4 py-3 bg-light">
+                            <div class="me-auto">
+                                <h6 class="fw-bold text-primary mb-1">{{ course.name }}</h6>
+                                <small class="text-muted">{{ course.description }}</small>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <a href="{% url 'edit_course' course.id %}"
+                                   class="btn btn-outline-info btn-sm rounded-pill shadow-sm">✏️ Edit</a>
+                                <a href="{% url 'delete_course' course.id %}"
+                                   class="btn btn-outline-danger btn-sm rounded-pill shadow-sm"
+                                   onclick="return confirm('Are you absolutely sure you want to delete this adorable course? 🥺');">
+                                    🗑️ Delete
+                                </a>
+                            </div>
+                        </li>
+                    {% empty %}
+                        <li class="list-group-item text-center text-muted py-4 bg-light">
+                            🚫 No courses added yet. Time to create some magic!
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Custom CSS -->
+<style>
+    .text-gradient {
+        background: linear-gradient(to right, #875cf5, #ff80b5);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+    }
+
+    .fancy-back-btn {
+        background: linear-gradient(to right, #ff9a9e, #fad0c4);
+        color: #fff;
+        font-weight: 600;
+        padding: 0.75rem 1.75rem;
+        border: none;
+        border-radius: 50px;
+        transition: all 0.3s ease-in-out;
+        display: inline-flex;
+        align-items: center;
+        font-size: 1.1rem;
+    }
+
+    .fancy-back-btn:hover {
+        background: linear-gradient(to right, #a18cd1, #fbc2eb);
+        transform: scale(1.05);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        text-decoration: none;
+        color: #fff;
+    }
+
+    .bg-light-subtle {
+        background-color: #f7f8fc !important;
+    }
+
+    .form-control,
+    .form-select,
+    textarea {
+        border-radius: 1.5rem !important;
+        box-shadow: 0 2px 6px rgba(135, 92, 245, 0.15);
+    }
+
+    .card {
+        border-radius: 1.5rem !important;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+    }
+
+    .btn-primary,
+    .btn-outline-info,
+    .btn-outline-danger {
+        border-radius: 2rem;
+        font-weight: 600;
+        padding: 0.5rem 1.5rem;
+    }
+
+    .btn-primary:hover {
+        background-color: #6f4bd8;
+        box-shadow: 0 4px 14px rgba(135, 92, 245, 0.3);
+    }
+
+    .btn-outline-danger:hover {
+        background-color: #ff4d6d;
+        color: white;
+        border-color: #ff4d6d;
+    }
+
+    .btn-outline-info:hover {
+        background-color: #3fc1c9;
+        color: white;
+        border-color: #3fc1c9;
+    }
+
+    .list-group-item:hover {
+        background-color: #f2f0ff;
+        transition: all 0.3s ease-in-out;
+    }
+</style>
+{% endblock %}

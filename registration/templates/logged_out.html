@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    body {
+        background: linear-gradient(135deg, #875cf5, #5d8bf4);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .logout-card {
+        background-color: white;
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease-in-out;
+    }
+    .logout-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 16px 35px rgba(0, 0, 0, 0.3);
+    }
+    .logout-title {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #875cf5;
+    }
+    .logout-subtitle {
+        font-size: 1.2rem;
+        color: #333;
+    }
+    .btn-login {
+        background-color: #875cf5;
+        border: none;
+        padding: 10px 25px;
+        font-size: 1rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+    .btn-login:hover {
+        background-color: #6c48e0;
+    }
+</style>
+
+<div class="container d-flex justify-content-center align-items-center min-vh-100">
+    <div class="logout-card text-center">
+        <h2 class="logout-title">You've been logged out!</h2>
+        <p class="logout-subtitle mt-3">Thanks for visiting the <strong>Student Course Portal</strong>.</p>
+        <a href="{% url 'login' %}" class="btn btn-login mt-4">Login Again</a>
+    </div>
+</div>
+{% endblock %}
